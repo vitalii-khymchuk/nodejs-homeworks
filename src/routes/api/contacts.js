@@ -12,8 +12,7 @@ router.get("/:contactId", isValidId, contactsCtrl.getById);
 
 router.post(
   "/",
-  isValidId,
-  contactsBodyValidation(contactSchemas.postContact),
+  contactsBodyValidation(contactSchemas.postContactSchema),
   contactsCtrl.post
 );
 
@@ -22,8 +21,15 @@ router.delete("/:contactId", isValidId, contactsCtrl.remove);
 router.put(
   "/:contactId",
   isValidId,
-  contactsBodyValidation(contactSchemas.postContact),
+  contactsBodyValidation(contactSchemas.postContactSchema),
   contactsCtrl.put
+);
+
+router.patch(
+  "/:contactId/favorite",
+  isValidId,
+  contactsBodyValidation(contactSchemas.updFavoriteSchema),
+  contactsCtrl.patchFav
 );
 
 module.exports = router;

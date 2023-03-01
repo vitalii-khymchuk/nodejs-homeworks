@@ -3,7 +3,7 @@ const { handleMongooseError } = require("../utils");
 const Joi = require("joi");
 
 const phoneRegex =
-  /^+?d{1,4}?[-.s]?(?d{1,3}?)?[-.s]?d{1,4}[-.s]?d{1,4}[-.s]?d{1,9}$/;
+  /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
 
 const contactSchema = new Schema(
   {
@@ -49,7 +49,9 @@ const postContactSchema = Joi.object({
 });
 
 const updFavoriteSchema = Joi.object({
-  favorite: Joi.bool().required(),
+  favorite: Joi.bool()
+    .required()
+    .messages({ "any.required": "missing field favorite" }),
 });
 
 const contactSchemas = { postContactSchema, updFavoriteSchema };

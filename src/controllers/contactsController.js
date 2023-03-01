@@ -2,7 +2,7 @@ const { ctrlWrap, HttpError } = require("../utils");
 const { Contact } = require("../models/contact");
 
 const get = async (req, res, next) => {
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({}, "-createdAt -updatedAt");
   res.json(contacts);
 };
 
@@ -35,10 +35,20 @@ const put = async (req, res) => {
   res.json(updContact);
 };
 
+const patchFav = async (req, res) => {
+  const id = req.params.contactId;
+  const updContact = await Contact.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+  if (!updContact) throw HttpError(404, `Contact with id: "${id}" not found`);
+  res.json(updContact);
+};
+
 module.exports = {
   get: ctrlWrap(get),
   getById: ctrlWrap(getById),
   post: ctrlWrap(post),
   remove: ctrlWrap(remove),
   put: ctrlWrap(put),
+  patchFav: ctrlWrap(patchFav),
 };
