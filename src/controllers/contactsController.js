@@ -1,33 +1,26 @@
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} = require("../../models/contacts");
-
 const { ctrlWrap, HttpError } = require("../utils");
+const { Contact } = require("../models/contact");
 
 const get = async (req, res, next) => {
-  const contacts = await listContacts();
+  const contacts = await Contact.find();
   res.json(contacts);
 };
 
 const getById = async (req, res, next) => {
   const id = req.params.contactId;
-  const contact = await getContactById(id);
+  const contact = await Contact.findById(id);
   if (!contact) throw HttpError(404, `Contact with id: "${id}" not found`);
   res.json(contact);
 };
 
 const post = async (req, res) => {
-  const addedContact = await addContact(req.body);
+  const addedContact = await Contact.create(req.body);
   res.status(201).json(addedContact);
 };
 
 const remove = async (req, res) => {
   const id = req.params.contactId;
-  const deletedContact = await removeContact(id);
+  const deletedContact = await Contact.findByIdAndRemove(id);
   if (!deletedContact)
     throw HttpError(404, `Contact with id: "${id}" not found`);
   res.json(deletedContact);
@@ -35,7 +28,9 @@ const remove = async (req, res) => {
 
 const put = async (req, res) => {
   const id = req.params.contactId;
-  const updContact = await updateContact(id, req.body);
+  const updContact = await Contact.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
   if (!updContact) throw HttpError(404, `Contact with id: "${id}" not found`);
   res.json(updContact);
 };
