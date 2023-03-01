@@ -1,64 +1,54 @@
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-} = require("../../models/contacts");
+const { ctrlWrap, HttpError } = require("../utils");
+const { Contact } = require("../models/contact");
 
-const getContact = async (req, res, next) => {
-  try {
-    const contacts = await listContacts();
-    return res.json(contacts);
-  } catch (error) {
-    next(error);
-  }
+const get = async (req, res, next) => {
+  const contacts = await Contact.find({}, "-createdAt -updatedAt");
+  res.json(contacts);
 };
 
 const getById = async (req, res, next) => {
-  try {
-    const id = req.params.contactId;
-    const contact = await getContactById(id);
-    return res.json(contact);
-  } catch (error) {
-    next(error);
-  }
+  const id = req.params.contactId;
+  const contact = await Contact.findById(id);
+  if (!contact) throw HttpError(404, `Contact with id: "${id}" not found`);
+  res.json(contact);
 };
 
-const postContact = async (req, res, next) => {
-  try {
-    const addedContact = await addContact(req.body);
-    res.status(201);
-    return res.json(addedContact);
-  } catch (error) {
-    next(error);
-  }
+const post = async (req, res) => {
+  const addedContact = await Contact.create(req.body);
+  res.status(201).json(addedContact);
 };
 
-const deleteContact = async (req, res, next) => {
-  try {
-    const id = req.params.contactId;
-    const deletedContact = await removeContact(id);
-    return res.json(deletedContact);
-  } catch (error) {
-    next(error);
-  }
+const remove = async (req, res) => {
+  const id = req.params.contactId;
+  const deletedContact = await Contact.findByIdAndRemove(id);
+  if (!deletedContact)
+    throw HttpError(404, `Contact with id: "${id}" not found`);
+  res.json(deletedContact);
 };
 
-const putContact = async (req, res, next) => {
-  try {
-    const id = req.params.contactId;
-    const updContact = await updateContact(id, req.body);
-    return res.json(updContact);
-  } catch (error) {
-    next(error);
-  }
+const put = async (req, res) => {
+  const id = req.params.contactId;
+  const updContact = await Contact.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+  if (!updContact) throw HttpError(404, `Contact with id: "${id}" not found`);
+  res.json(updContact);
+};
+
+const patchFav = async (req, res) => {
+  const id = req.params.contactId;
+  const updContact = await Contact.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+  if (!updContact) throw HttpError(404, `Contact with id: "${id}" not found`);
+  res.json(updContact);
 };
 
 module.exports = {
-  getContact,
-  getById,
-  postContact,
-  deleteContact,
-  putContact,
+  get: ctrlWrap(get),
+  getById: ctrlWrap(getById),
+  post: ctrlWrap(post),
+  remove: ctrlWrap(remove),
+  put: ctrlWrap(put),
+  patchFav: ctrlWrap(patchFav),
 };
