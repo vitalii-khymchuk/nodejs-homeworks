@@ -1,5 +1,10 @@
 const handleMongooseError = (error, data, next) => {
-  error.status = 400;
+  if (error.code === 11000) {
+    error.status = 409;
+    error.message = "User already exist";
+  } else {
+    error.status = 400;
+  }
   next();
 };
 

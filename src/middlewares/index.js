@@ -1,4 +1,5 @@
-const { contactsBodyValidation } = require("./validationMiddleware");
+const { validateBody } = require("./validationMiddleware");
 const { isValidId } = require("./isValidId");
+const { authenticate } = require("./authenticate");
 
-module.exports = { contactsBodyValidation, isValidId };
+module.exports = { validateBody, isValidId, authenticate };
