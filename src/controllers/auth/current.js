@@ -1,11 +1,8 @@
 const { User } = require("../../models");
 const { ctrlWrap } = require("../../utils");
-const jwt = require("jsonwebtoken");
 
 const current = async (req, res) => {
-  const { authorization = "" } = req.headers;
-  const [, token] = authorization.split(" ");
-  const { id } = await jwt.decode(token);
+  const { id } = req.user;
   const { email, subscription } = await User.findByIdAndUpdate(id, {
     token: null,
   });
