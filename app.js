@@ -3,6 +3,7 @@ const logger = require("morgan");
 const cors = require("cors");
 
 const { contactsRouter, authRouter } = require("./src/routes/api");
+
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";

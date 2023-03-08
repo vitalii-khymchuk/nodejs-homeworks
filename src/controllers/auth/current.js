@@ -3,10 +3,8 @@ const { ctrlWrap } = require("../../utils");
 
 const current = async (req, res) => {
   const { id } = req.user;
-  const { email, subscription } = await User.findByIdAndUpdate(id, {
-    token: null,
-  });
-  res.status(200).json({ code: 200, data: { email, subscription } });
+  const { email, subscription, avatar } = await User.findById(id);
+  res.status(200).json({ code: 200, data: { email, subscription, avatar } });
 };
 
 module.exports = { current: ctrlWrap(current) };

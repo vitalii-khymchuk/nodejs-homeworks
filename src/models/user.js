@@ -33,9 +33,22 @@ const userSchema = new Schema(
       enum: subsciptions,
       default: "starter",
     },
-    avatarURL: {
-      type: String,
+    avatar: {
+      type: Object({
+        name: {
+          type: String,
+          required: true,
+        },
+        imageLink: {
+          type: String,
+          required: true,
+        },
+      }),
       required: true,
+      default: {
+        name: null,
+        imageLink: null,
+      },
     },
     token: {
       type: String,

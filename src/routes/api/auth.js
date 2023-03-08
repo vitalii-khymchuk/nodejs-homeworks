@@ -1,6 +1,8 @@
 const express = require("express");
 const { authCtrl } = require("../../controllers");
 
+const { moveFromTmpToCloud } = require("../../middlewares");
+
 const {
   validateBody,
   authenticate,
@@ -29,6 +31,7 @@ router.patch(
   "/avatars",
   authenticate,
   handleFormData.single("avatar"),
+  moveFromTmpToCloud,
   authCtrl.patchAvatar
 );
 

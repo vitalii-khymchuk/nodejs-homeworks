@@ -13,7 +13,7 @@ const signup = async (req, res) => {
   const newUser = await User.create({
     ...req.body,
     password: hashedPw,
-    avatarURL,
+    avatar: { imageLink: avatarURL, name: "default" },
   });
 
   const token = jwt.sign({ id: newUser._id }, SECRET_KEY);
