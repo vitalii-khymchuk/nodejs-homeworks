@@ -10,8 +10,9 @@ const uploadFile = async (path, filename) => {
   };
   try {
     const [data] = await storage.bucket(BUCKET_NAME).upload(path, options);
+    await storage.bucket(BUCKET_NAME).file(filename).makePublic();
     console.log(`${filename} uploaded to ${BUCKET_NAME}`);
-    return data.metadata.mediaLink;
+    return `https://storage.cloud.google.com/${BUCKET_NAME}/${data.metadata.name}`;
   } catch (error) {
     console.log(error);
     throw HttpError(500);
@@ -24,7 +25,6 @@ const removeFile = async (fileName) => {
     console.log(`gs://${BUCKET_NAME}/${fileName} deleted`);
   } catch (error) {
     console.log(error);
-    throw HttpError(500);
   }
 };
 

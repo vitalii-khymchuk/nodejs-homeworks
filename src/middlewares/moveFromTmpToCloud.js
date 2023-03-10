@@ -1,12 +1,15 @@
 const { googleCloud } = require("../services/");
 const fs = require("fs/promises");
-const { HttpError } = require("../utils");
+const { HttpError, resizeImage } = require("../utils");
 
 const moveFromTmpToCloud = async (req, res, next) => {
   const { avatar } = req.user; // Current avatar
   const { path: tempPath, filename } = req.file;
+
   try {
-    //upload to cloud
+    //reduce image size
+    await resizeImage(tempPath);
+    // upload to cloud
     const imageLink = await googleCloud.uploadFile(tempPath, filename);
     //Removing file locally
     await fs.unlink(tempPath, (err) => {
@@ -18,7 +21,7 @@ const moveFromTmpToCloud = async (req, res, next) => {
       }
     });
     //Removing old file from cloud
-    if (avatar.name && avatar.name !== "default") {
+    if (avatar.name && avatar.name !== "default" && avatar.name !== filename) {
       await googleCloud.removeFile(avatar.name);
     }
     req.avatar = { imageLink, name: filename };

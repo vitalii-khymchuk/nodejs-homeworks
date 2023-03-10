@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
     const { id } = req.user;
     const fileName = `${id}_${file.originalname}`;
 
-    if (!extensions.some((e) => fileName.endsWith(e))) {
+    if (!extensions.some((e) => fileName.toLowerCase().endsWith(e))) {
       cb(HttpError(400, "Invalid  extension type"));
     } else {
       cb(null, fileName);
