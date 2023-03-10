@@ -10,7 +10,6 @@ const uploadFile = async (path, filename) => {
   };
   try {
     const [data] = await storage.bucket(BUCKET_NAME).upload(path, options);
-    await storage.bucket(BUCKET_NAME).file(filename).makePublic();
     console.log(`${filename} uploaded to ${BUCKET_NAME}`);
     return data.metadata.mediaLink;
   } catch (error) {
