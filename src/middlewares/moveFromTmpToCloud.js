@@ -3,10 +3,9 @@ const fs = require("fs/promises");
 const { HttpError, resizeImage } = require("../utils");
 
 const moveFromTmpToCloud = async (req, res, next) => {
-  const { avatar } = req.user; // Current avatar
-  const { path: tempPath, filename } = req.file;
-
   try {
+    const { avatar } = req.user; // Current avatar
+    const { path: tempPath, filename } = req.file;
     //reduce image size
     await resizeImage(tempPath);
     // upload to cloud
