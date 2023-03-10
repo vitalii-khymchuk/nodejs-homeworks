@@ -1,10 +1,8 @@
 const { User } = require("../../models");
-const jwt = require("jsonwebtoken");
+const { ctrlWrap } = require("../../utils/");
 
 const patchSubscription = async (req, res) => {
-  const { authorization = "" } = req.headers;
-  const [, token] = authorization.split(" ");
-  const { id } = await jwt.decode(token);
+  const { id } = req.user;
   const user = await User.findByIdAndUpdate(id, req.body, {
     new: true,
   });
@@ -12,4 +10,4 @@ const patchSubscription = async (req, res) => {
   res.status(200).json({ code: 200, data: user });
 };
 
-module.exports = { patchSubscription };
+module.exports = { patchSubscription: ctrlWrap(patchSubscription) };
