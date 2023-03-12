@@ -1,3 +1,4 @@
 const googleCloud = require("./googleCloud");
+const sendGrid = require("./sendGrid");
 
-module.exports = { googleCloud };
+module.exports = { googleCloud, sendGrid };

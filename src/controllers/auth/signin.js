@@ -8,7 +8,7 @@ const signin = async (req, res) => {
   if (!email || !password) {
     throw HttpError(400, "Please provide all necessary data");
   }
-  const [user] = await User.findOne({ email });
+  const user = await User.findOne({ email, verify: true });
 
   if (!user) throw HttpError(401, "Email or password invalid");
 

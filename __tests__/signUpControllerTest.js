@@ -2,12 +2,16 @@ const { signup } = require("../src/controllers/auth");
 const { User } = require("../src/models");
 const bcrypt = require("bcrypt");
 const { HttpError } = require("../src/utils");
+const { sendGrid } = require("../src/services");
 require("dotenv").config();
 
 describe("Sign Up controller test", () => {
   it("should crete new user, write to res token and status code ", async () => {
     let mUser = {};
-    const mReq = { body: { email: "test", name: "test", password: "test" } };
+    const mReq = {
+      body: { email: "test", name: "test", password: "test" },
+      headers: { host: "test" },
+    };
     const mRes = {
       code: null,
       data: null,
@@ -20,7 +24,9 @@ describe("Sign Up controller test", () => {
       },
     };
 
-    jest.spyOn(User, "find").mockImplementationOnce(() => Promise.resolve([]));
+    jest
+      .spyOn(User, "findOne")
+      .mockImplementationOnce(() => Promise.resolve(null));
 
     jest.spyOn(User, "create").mockImplementationOnce((data) => {
       const newUser = { ...data, _id: "123" };
@@ -30,27 +36,34 @@ describe("Sign Up controller test", () => {
 
     jest.spyOn(User, "findByIdAndUpdate").mockImplementationOnce((id, data) => {
       mUser = { ...mUser, ...data };
-      return Promise.resolve([mUser]);
+      return Promise.resolve(mUser);
     });
 
     jest
       .spyOn(bcrypt, "hash")
       .mockImplementationOnce(() => Promise.resolve("hashedPassword"));
 
-    await signup(mReq, mRes);
+    const mSendGrid = jest
+      .spyOn(sendGrid, "sendVerificationEmail")
+      .mockImplementationOnce(() => Promise.resolve());
 
+    const mNext = jest.fn();
+
+    await signup(mReq, mRes, mNext);
+    expect(mSendGrid).toHaveBeenCalledWith(mReq.body.email);
     //check user fields
-    expect(mUser.email).toEqual(mReq.body.email);
-    expect(mUser.name).toEqual(mReq.body.name);
+    expect(mUser.email).toBe(mReq.body.email);
+    expect(mUser.name).toBe(mReq.body.name);
     expect(mUser.password).toBe("hashedPassword");
     expect(mUser._id).toBe("123");
-    expect(typeof mUser.token).toBe("string");
     expect(typeof mUser.avatar.imageLink).toBe("string");
     expect(typeof mUser.avatar.name).toBe("string");
     //check res
     expect(mRes.code).toBe(201);
     expect(mRes.data.code).toBe(201);
-    expect(typeof mRes.data.token).toBe("string");
+    expect(mRes.data.message).toBe(
+      `Profile has been created, verification link were sent to ${mUser.email}`
+    );
   });
   it("should call next() and pass error 400 is case of name field is empty or absent", async () => {
     const mReq = { body: { email: "test", name: "", password: "test" } };
@@ -84,8 +97,8 @@ describe("Sign Up controller test", () => {
     const mRes = {};
     const mNext = jest.fn();
     jest
-      .spyOn(User, "find")
-      .mockImplementationOnce(() => Promise.resolve([{}]));
+      .spyOn(User, "findOne")
+      .mockImplementationOnce(() => Promise.resolve({ verify: true }));
     await signup(mReq, mRes, mNext);
     expect(mNext).toHaveBeenCalledWith(
       HttpError(400, `User with ${mReq.body.email} already exist`)
@@ -96,7 +109,7 @@ describe("Sign Up controller test", () => {
     const mRes = {};
     const mNext = jest.fn();
     jest
-      .spyOn(User, "find")
+      .spyOn(User, "findOne")
       .mockImplementationOnce(() => Promise.reject("test error"));
     await signup(mReq, mRes, mNext);
     expect(mNext).toHaveBeenCalledWith("test error");

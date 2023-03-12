@@ -19,7 +19,7 @@ const userSchema = new Schema(
       required: true,
       trim: true,
       minLength: 3,
-      maxLength: 30,
+      maxLength: 50,
       match: emailRegexp,
       unique: true,
     },
@@ -54,6 +54,14 @@ const userSchema = new Schema(
       type: String,
       default: null,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -63,7 +71,7 @@ userSchema.post("save", handleMongooseError);
 const sighUpSchema = Joi.object({
   email: Joi.string()
     .min(3)
-    .max(30)
+    .max(50)
     .email({ tlds: { deny: ["ru"] } })
     .pattern(emailRegexp)
     .required(),
@@ -74,7 +82,7 @@ const sighUpSchema = Joi.object({
 const sighInSchema = Joi.object({
   email: Joi.string()
     .min(3)
-    .max(30)
+    .max(50)
     .email({ tlds: { deny: ["ru"] } })
     .pattern(emailRegexp)
     .required(),
