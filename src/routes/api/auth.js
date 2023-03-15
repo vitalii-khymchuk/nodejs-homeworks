@@ -35,4 +35,6 @@ router.patch(
   authCtrl.patchAvatar
 );
 
+router.get("/verify/:verificationToken", authCtrl.verification);
+
 module.exports = router;
